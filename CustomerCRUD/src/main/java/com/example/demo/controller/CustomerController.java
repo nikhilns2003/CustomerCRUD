@@ -1,0 +1,167 @@
+//package com.example.demo.controller;
+//
+//
+//import java.util.List;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.DeleteMapping;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.PathVariable;
+//import org.springframework.web.bind.annotation.PostMapping;
+//import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RestController;
+//
+//import com.example.demo.model.Customer;
+//import com.example.demo.service.CustomerService;
+
+
+//@RestController 
+//public class CustomerController {
+//	
+//	@Autowired
+//	private CustomerService cs;
+//	
+////	@PostMapping("add")
+////	public void add(@RequestBody Customer c) {
+////		cs.add(c);
+////	}
+//	
+//	@PostMapping("add")
+//	public void add(@RequestBody List<Customer> list) {
+//		list.forEach(x -> cs.add(x));
+//	}
+//	
+//	@GetMapping("display")
+//	public List<Customer>display() {
+//		return cs.display();
+//	}
+//	
+////	@DeleteMapping("delete/{id}")
+////	public Customer delete(@PathVariable Integer id) {
+////		return cs.delete(id);
+////	}
+//	
+//	@DeleteMapping("delete/{id}")
+//	// ? -> Any
+//	public ResponseEntity<?> delete(@PathVariable Integer id) {
+//		Customer temp =  cs.delete(id);
+//		if(temp==null) {
+//			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//					.body("Not Found !! ");
+//						}
+//		return ResponseEntity.ok(temp); 
+//		}
+//	
+//	
+//	@PostMapping("search/{id}")
+//	public Customer search(@PathVariable Integer id) {
+//		return cs.search(id);
+//	}
+//
+//	@PostMapping("search/mob/{id}")
+//		public Customer searchMob(@PathVariable String mob) {
+//			return cs.findMob(mob);
+//		}
+//	
+//}
+
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Customer;
+import com.example.demo.service.CustomerService;
+@RestController
+public class CustomerController {
+
+    @Autowired
+    private CustomerService cs;
+
+    // ADD MULTIPLE CUSTOMERS
+    @PostMapping("add")
+    public ResponseEntity<?> add(@RequestBody List<Customer> list) {
+
+        if (list == null || list.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Customer list is empty");
+        }
+
+        list.forEach(c -> cs.add(c));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Customers added successfully");
+    }
+
+    // DISPLAY ALL
+    @GetMapping("display")
+    public ResponseEntity<?> display() {
+
+        List<Customer> customers = cs.display();
+
+        if (customers == null || customers.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .body("No customers found");
+        }
+
+        return ResponseEntity.ok(customers);
+    }
+
+    // DELETE BY ID
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
+
+        Customer temp = cs.delete(id);
+
+        if (temp == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Customer not found");
+        }
+
+        return ResponseEntity.ok(temp);
+    }
+
+    // SEARCH BY ID
+    @GetMapping("search/{id}")
+    public ResponseEntity<?> search(@PathVariable Integer id) {
+
+        Customer customer = cs.search(id);
+
+        if (customer == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Customer not found");
+        }
+
+        return ResponseEntity.ok(customer);
+    }
+
+    // SEARCH BY MOBILE
+    @GetMapping("search/mob/{mob}")
+    public ResponseEntity<?> searchMob(@PathVariable String mob) {
+
+        Customer customer = cs.findMob(mob);
+
+        if (customer == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Customer with this mobile not found");
+        }
+
+        return ResponseEntity.ok(customer);
+    }
+}
